@@ -14,7 +14,7 @@ public class Target : MonoBehaviour
             gameObject.SetActive(false);
             TargetSpawner.Instance.SpawnNext();
             UIManager.Instance.RegisterHit();
-            AudioManager.Instance.PlayHitSound();
+            AudioManager.Instance.Play("hit");
         }
     }
 }

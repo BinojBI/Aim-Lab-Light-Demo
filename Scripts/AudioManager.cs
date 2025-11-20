@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AimlabDemo
@@ -6,7 +8,18 @@ namespace AimlabDemo
     {
         public static AudioManager Instance;
 
-        private AudioSource m_AudioSource;
+        [Serializable]
+        public class Sound
+        {
+            public string name;
+            public AudioClip clip;
+            public float volume = 1f;
+
+            [HideInInspector]
+            public AudioSource source;
+        }
+
+        public List<Sound> sounds = new List<Sound>();
 
         private void Awake()
         {
@@ -20,14 +33,28 @@ namespace AimlabDemo
                 Destroy(gameObject);
                 return;
             }
+
+            foreach (var s in sounds)
+            {
+                s.source = gameObject.AddComponent<AudioSource>();
+                s.source.clip = s.clip;
+                s.source.volume = s.volume;
+            }
         }
-        private void Start()
+        public void Play(string name)
         {
-            m_AudioSource = GetComponent<AudioSource>();
+            Sound s = sounds.Find(x => x.name == name);
+            if (s != null)
+                s.source.Play();
+            else
+                Debug.LogWarning("Sound not found: " + name);
         }
-        public void PlayHitSound()
+
+        public void Stop(string name)
         {
-            m_AudioSource.Play();
+            Sound s = sounds.Find(x => x.name == name);
+            if (s != null)
+                s.source.Stop();
         }
     }
 }

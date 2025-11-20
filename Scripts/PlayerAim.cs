@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 namespace AimlabDemo { 
 public class PlayerAim : MonoBehaviour
@@ -56,11 +57,16 @@ public class PlayerAim : MonoBehaviour
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             if (Physics.Raycast(ray, out RaycastHit hit, 100))
             {
-                if (hit.collider.CompareTag("Target"))
+                Target target = hit.collider.GetComponent<Target>();
+
+                if (target != null)
                 {
-                    hit.collider.GetComponent<Target>().Hit();
+                    target.Hit(); 
+                    return;
                 }
             }
+
+            UIManager.Instance.RegisterMiss();
         }
     }
 }

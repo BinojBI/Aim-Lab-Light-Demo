@@ -1,5 +1,6 @@
 using NUnit.Framework.Internal;
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,10 +24,13 @@ public class UIManager : MonoBehaviour
         private float currentSpeed = 0f; 
         private float averageSpeed = 0f;
         private int totalHits = 0;
+        private int score = 0;
+        private float totalScore = 0;
 
         public TextMeshProUGUI speedValueText;
         public TextMeshProUGUI avgValueText;
         public TextMeshProUGUI bestAvgValueText;
+        public TextMeshProUGUI scoreValueText;
 
         public float sessionLength = 60f;
         bool isPaused = false;
@@ -37,6 +41,11 @@ public class UIManager : MonoBehaviour
         public TextMeshProUGUI sessionInfoText;
 
         bool sessionRunning = false;
+
+        public Image damageOverlay;
+        public float flashAlpha = 0.6f;
+        public float fadeSpeed = 1.5f;
+        float currentAlpha = 0f;
 
         private void Awake()
         {
@@ -90,6 +99,8 @@ public class UIManager : MonoBehaviour
 
             UpdateSession();
 
+           
+
         }
 
         public void PauseSession()
@@ -105,7 +116,8 @@ public class UIManager : MonoBehaviour
         public void StartSession()
         {
             float best = GetHighScore();
-            bestAvgValueText.text = "Best Average Speed : "+best.ToString("0.00");
+            bestAvgValueText.text = "Best Score : "+best.ToString("0.00");
+            scoreValueText.text = "Score : 00";
 
             timeLeft = sessionLength;
             sessionRunning = true;
@@ -146,9 +158,10 @@ public class UIManager : MonoBehaviour
             sessionInfoText.text =
                 "Session Over!\n" +
                 "Avg Speed: " + averageSpeed.ToString("0.00") + "\n" +
-                "Best Avg: " + GetHighScore().ToString("0.00");
+                "Current Score: " + totalScore.ToString("0.00") + "\n" +
+                "Best Score: " + GetHighScore().ToString("0.00");
 
-            bestAvgValueText.text = "Best Average Speed : " + GetHighScore().ToString("0.00");
+            bestAvgValueText.text = "Best Score : " + GetHighScore().ToString("0.00");
         }
 
         public void ResetSession()
@@ -156,6 +169,8 @@ public class UIManager : MonoBehaviour
             totalHits = 0;
             averageSpeed = 0;
             currentSpeed = 0;
+            score = 0;
+            totalScore = 0;
             lastHitTime = Time.time;
         }
 
@@ -194,27 +209,65 @@ public class UIManager : MonoBehaviour
                 speedValueText.text = currentSpeed.ToString("0.00");
                 // Running average
                 averageSpeed = (averageSpeed * (totalHits - 1) + currentSpeed) / totalHits;
+
                 avgValueText.text = averageSpeed.ToString("0.00");
             }
 
             totalHits++;
+            score += 10;
+            totalScore = score * averageSpeed;
+            scoreValueText.text = "Score : " + totalScore.ToString("F2");
+
             lastHitTime = now;
+        }
+
+        public void RegisterMiss()
+        {
+            totalHits--;
+            score -= 5;
+            totalScore = score * averageSpeed;
+            scoreValueText.text = "Score : " + totalScore.ToString("F2");
+            if (score < 0) score = 0;
+            AudioManager.Instance.Play("miss");
+            ShowDamage();
+        }
+
+        public void ShowDamage()
+        {
+            if(StartCoroutine(UpdateDamageOverlay()) != null)
+                return;
+
+            StartCoroutine(UpdateDamageOverlay());
+        }
+
+        IEnumerator UpdateDamageOverlay()
+        {
+            Color c = damageOverlay.color;
+            c.a = flashAlpha;
+            damageOverlay.color = c;
+
+            while (c.a > 0f)
+            {
+                c.a -= Time.deltaTime * fadeSpeed;
+                damageOverlay.color = c;
+                yield return null; 
+            }
         }
 
         public void SaveHighScore()
         {
-            float best = PlayerPrefs.GetFloat("BestAverageSpeed", 0f);
+            float best = PlayerPrefs.GetFloat("BestSocre", 0f);
 
-            if (averageSpeed > best)
+            if (totalScore > best)
             {
-                PlayerPrefs.SetFloat("BestAverageSpeed", averageSpeed);
+                PlayerPrefs.SetFloat("BestSocre", totalScore);
                 PlayerPrefs.Save();
             }
         }
 
         public float GetHighScore()
         {
-            return PlayerPrefs.GetFloat("BestAverageSpeed", 0f);
+            return PlayerPrefs.GetFloat("BestSocre", 0f);
         }
     }
 
