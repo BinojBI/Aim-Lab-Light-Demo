@@ -22,9 +22,9 @@ namespace AimlabDemo
             }
         }
 
-        public void LoadPrectice1()
+        public void LoadScene(string sceneName)
         {
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene(sceneName);
         }
     }
 }

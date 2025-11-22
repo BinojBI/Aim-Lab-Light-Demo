@@ -269,6 +269,11 @@ public class UIManager : MonoBehaviour
         {
             return PlayerPrefs.GetFloat("BestSocre", 0f);
         }
+
+        public void LoadMainMenuScene()
+        {
+            SceneController.Instance.LoadScene("Menu");
+        }
     }
 
 }
