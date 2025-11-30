@@ -15,9 +15,11 @@ public class UIManager : MonoBehaviour
         private Slider sensitivitySlider;
         private Slider xSpawnDistanceSlider;
         private Slider ySpawnDistanceSlider;
+        private Slider targetSizeSlider;
         private TextMeshProUGUI sliderValueText;
         private TextMeshProUGUI xDistanceValueSliderValueText;
         private TextMeshProUGUI yDistanceValueSliderValueText;
+        private TextMeshProUGUI targetSizeValueText;
         public GameObject settingsPanel;
 
         float lastHitTime = 0f;
@@ -53,9 +55,11 @@ public class UIManager : MonoBehaviour
             sensitivitySlider = settingsPanel.transform.GetChild(0).GetComponent<Slider>();
             xSpawnDistanceSlider = settingsPanel.transform.GetChild(1).GetComponent<Slider>();
             ySpawnDistanceSlider = settingsPanel.transform.GetChild(2).GetComponent<Slider>();
-            sliderValueText = settingsPanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
-            xDistanceValueSliderValueText = settingsPanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
-            yDistanceValueSliderValueText = settingsPanel.transform.GetChild(8).GetComponent<TextMeshProUGUI>();
+            targetSizeSlider = settingsPanel.transform.GetChild(3).GetComponent<Slider>();
+            sliderValueText = settingsPanel.transform.GetChild(8).GetComponent<TextMeshProUGUI>();
+            xDistanceValueSliderValueText = settingsPanel.transform.GetChild(9).GetComponent<TextMeshProUGUI>();
+            yDistanceValueSliderValueText = settingsPanel.transform.GetChild(10).GetComponent<TextMeshProUGUI>();
+            targetSizeValueText = settingsPanel.transform.GetChild(11).GetComponent<TextMeshProUGUI>();
         }
 
         void Start()
@@ -65,9 +69,11 @@ public class UIManager : MonoBehaviour
             sensitivitySlider.value = player.mouseSensitivity;
             xSpawnDistanceSlider.value = targetSpawner.spawnRange.x;
             ySpawnDistanceSlider.value = targetSpawner.spawnRange.y;
+            targetSizeSlider.value = targetSpawner.targetSize;
             sliderValueText.text = player.mouseSensitivity.ToString("0.000");
             xDistanceValueSliderValueText.text = targetSpawner.spawnRange.x.ToString("0.00");
             yDistanceValueSliderValueText.text = targetSpawner.spawnRange.y.ToString("0.00");
+            targetSizeValueText.text = targetSpawner.targetSize.ToString("0.00");
 
             sensitivitySlider.onValueChanged.AddListener(val =>
             {
@@ -85,6 +91,18 @@ public class UIManager : MonoBehaviour
             {
                 targetSpawner.spawnRange.y = val;
                 yDistanceValueSliderValueText.text = val.ToString("0.00");
+            });
+
+            targetSizeSlider.onValueChanged.AddListener(val =>
+            {
+                targetSpawner.targetSize = val;
+                targetSizeValueText.text = val.ToString("0.00");
+                var main = player.impact.main;
+                main.startSizeX = targetSpawner.targetSize/2*3;
+                main.startSizeY = (targetSpawner.targetSize / 2 * 3)*1.5f;
+                main.startSizeZ = targetSpawner.targetSize / 2 * 3;
+                player.impactYOffset = targetSpawner.targetSize / 2f;
+
             });
         }
 

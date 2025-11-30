@@ -7,6 +7,7 @@ public class TargetSpawner : MonoBehaviour
     public static TargetSpawner Instance;
 
     public Transform targetBase;
+    public float targetSize = 0.2f;
     public Vector2 spawnRange = new Vector2(4f, 2.5f);
     public int activeTargets = 5;
 
@@ -48,7 +49,7 @@ public class TargetSpawner : MonoBehaviour
 
         } while (IsOverlapping(spawnPos));
 
-        t.GetComponent<Target>().Activate(spawnPos);
+        t.GetComponent<Target>().Activate(spawnPos, new Vector3(targetSize, targetSize, targetSize));
     }
 
     bool IsOverlapping(Vector3 newPos)

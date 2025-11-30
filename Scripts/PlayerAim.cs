@@ -7,9 +7,10 @@ public class PlayerAim : MonoBehaviour
 {
     public float mouseSensitivity = 3f;
     public bool uiPanelActive = false;
+    public ParticleSystem impact;
+    public float impactYOffset = 0.1f;
     Camera cam;
     float xRotation = 0f;
-        public UIManager uIManager;
 
         void Start()
         {
@@ -61,6 +62,8 @@ public class PlayerAim : MonoBehaviour
 
                 if (target != null)
                 {
+                    impact.gameObject.transform.position = new Vector3(target.transform.position.x, target.transform.position.y + impactYOffset, target.transform.position.z);
+                    impact.Play();
                     target.Hit(); 
                     return;
                 }
